@@ -8,4 +8,5 @@
 //                      usuario_id INT,
 //                      title VARCHAR(100) NOT NULL,
 //                      description TEXT,
+//                      due DATE,
 //                     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE);
