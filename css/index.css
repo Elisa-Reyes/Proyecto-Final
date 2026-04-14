@@ -19,7 +19,7 @@ body {
 }
 
 .logo img {
-  width: 100px;
+  width: 200px;
   height: auto;
   margin-bottom: 30px;
 }
@@ -40,17 +40,17 @@ button {
 }
 
 button:first-child {
-  background-color: #007bff;
+  background-color: #3573b6;
   color: white;
 }
 
 button:last-child {
   background-color: transparent;
-  border: 2px solid #007bff;
-  color: #007bff;
+  border: 2px solid #3573b6;
+  color: #3573b6;
 }
 
 button:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
   opacity: 0.9;
 }
