@@ -1,9 +1,23 @@
 {
-  "name": "Dot",
+  "name": "dot",
   "version": "1.0.0",
   "description": "to-do list",
   "main": "index.js",
   "repository": "https://github.com/Elisa-Reyes/Proyecto-Final.git",
   "author": "Elisa-Reyes <elisa_3141240138@utd.edu.mx>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mysql2": "^3.22.0"
+  }
 }
