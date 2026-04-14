@@ -1,0 +1,56 @@
+/* main.css */
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #d4e7fb;
+  font-family: sans-serif;
+}
+
+.todo {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  width: 500px;
+}
+
+.logo img {
+  width: 100px;
+  height: auto;
+  margin-bottom: 30px;
+}
+
+.botones {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:first-child {
+  background-color: #007bff;
+  color: white;
+}
+
+button:last-child {
+  background-color: transparent;
+  border: 2px solid #007bff;
+  color: #007bff;
+}
+
+button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}

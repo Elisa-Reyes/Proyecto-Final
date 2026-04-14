@@ -1,0 +1,9 @@
+{
+  "name": "Dot",
+  "version": "1.0.0",
+  "description": "to-do list",
+  "main": "index.js",
+  "repository": "https://github.com/Elisa-Reyes/Proyecto-Final.git",
+  "author": "Elisa-Reyes <elisa_3141240138@utd.edu.mx>",
+  "license": "MIT"
+}
