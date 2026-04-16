@@ -6,6 +6,7 @@ const session = require("express-session");
 const app = express();
 
 const registro = require("./js/registro");
+const login = require("./js/login");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,6 +22,7 @@ app.use(
 );
 
 app.use("/signin", registro);
+app.use("/log-in", login);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
@@ -28,6 +30,10 @@ app.get("/", (req, res) => {
 
 app.get("/registro", (req, res) => {
   res.sendFile(path.join(__dirname, "html/registro.html"));
+});
+
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "html/login.html"));
 });
 
 app.listen(3000, () => {
