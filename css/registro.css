@@ -5,7 +5,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #d4e7fb;
+  background-color: #d4e7fb; /* Tu azul suave de fondo */
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 

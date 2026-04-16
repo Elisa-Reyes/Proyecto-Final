@@ -12,9 +12,8 @@ body {
 .todo {
   background: white;
   padding: 40px;
-  border-radius: 20px;
   text-align: center;
-  width: 500px;
+  width: 100%;
 }
 
 .logo img {
@@ -26,6 +25,7 @@ body {
 .botones {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 15px;
 }
 
@@ -36,6 +36,8 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
+  width: 300px;
+  min-width: 150px;
 }
 
 button:first-child {
