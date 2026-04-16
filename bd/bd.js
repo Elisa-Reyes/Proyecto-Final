@@ -10,3 +10,21 @@
 //                      description TEXT,
 //                      due DATE,
 //                     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE);
+
+const mysql = require("mysql2");
+
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "todo",
+});
+
+db.connect((err) => {
+  if (err) {
+    console.err("error de conexion: ", err);
+  }
+  console.log("conectado, todobien");
+});
+
+module.exports = db;

@@ -10,26 +10,26 @@
     <div class="todote">
       <h1>Sign Up!</h1>
       <div>
-        <form>
-          <label for="name">Name:</label><br />
+        <form action="/signin/usuarios" method="post">
+          <label for="nombre">Name:</label><br />
           <input
             type="text"
-            id="name"
-            name="name"
+            id="nombre"
+            name="nombre"
             placeholder="Name here!"
           /><br />
           <label for="email">E-mail:</label><br />
           <input
-            type="text"
+            type="email"
             id="email"
             name="email"
             placeholder="E-mail here!"
           /><br />
-          <label for="pass">Password:</label><br />
+          <label for="password">Password:</label><br />
           <input
-            type="text"
-            id="pass"
-            name="pass"
+            type="password"
+            id="password"
+            name="password"
             placeholder="Password here!"
           /><br />
           <input type="submit" value="Submit" />
