@@ -29,7 +29,6 @@ function formatDue(dateStr, completed) {
   return { label: `${due.getDate()}/${due.getMonth() + 1}`, cls: "" };
 }
 
-// --- NUEVO: Actualiza los números en la barra lateral ---
 function updateCounts() {
   const countAll = document.getElementById("count-all");
   const countPending = document.getElementById("count-pending");
@@ -74,13 +73,11 @@ function render() {
   const searchQuery = searchInput ? searchInput.value.toLowerCase() : "";
 
   const filtered = allTasks.filter((t) => {
-    // Filtro por categoría lateral
     const matchesFilter =
       currentFilter === "all" ||
       (currentFilter === "pending" && !t.completed) ||
       (currentFilter === "done" && t.completed);
 
-    // Filtro por texto de búsqueda
     const matchesSearch =
       t.title.toLowerCase().includes(searchQuery) ||
       (t.description && t.description.toLowerCase().includes(searchQuery));
@@ -125,7 +122,7 @@ window.toggleTask = async (id) => {
 };
 
 window.deleteTask = async (id) => {
-  if (!confirm("¿Borrar tarea?")) return;
+  if (!confirm("Erase task?")) return;
   const res = await fetch(`/tasks/tasks/${id}`, {
     method: "DELETE",
     credentials: "include",
