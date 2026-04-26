@@ -14,7 +14,7 @@ router.post("/usuarios", async (req, res) => {
         console.error("Database error:", err);
         return res.status(500).send("Error creating user");
       }
-      res.send("todobien, usuario creado");
+      res.redirect("/login");
     });
   } catch (error) {
     console.error("Server error:", error);

@@ -1,385 +1,213 @@
 let allTasks = [];
 let currentFilter = "all";
-let sortMode = null;
 
-function showError(msg) {
-  document.body.innerHTML = `
-    <div style="
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      height:100vh; font-family:sans-serif; background:#0f172a; color:#f87171;
-      padding:2rem; text-align:center;
-    ">
-      <div style="font-size:3rem; margin-bottom:1rem;">⚠️</div>
-      <div style="font-size:1.2rem; font-weight:bold; margin-bottom:0.5rem;">Algo salió mal</div>
-      <div style="font-size:0.95rem; color:#fca5a5; max-width:400px;">${msg}</div>
-      <a href="/login" style="
-        margin-top:1.5rem; padding:0.6rem 1.4rem; background:#3b82f6;
-        color:white; border-radius:8px; text-decoration:none; font-size:0.9rem;
-      ">Ir al login</a>
-    </div>`;
-}
-
-function toast(msg, ms = 2400) {
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.classList.add("show");
-  setTimeout(() => el.classList.remove("show"), ms);
-}
-
-function esc(s) {
-  return String(s || "")
+// --- UTILIDADES ---
+const esc = (s) =>
+  String(s || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
+    .replace(/>/g, "&gt;");
 
-function initials(name) {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
+const toast = (msg) => {
+  const el = document.getElementById("toast");
+  if (el) {
+    el.textContent = msg;
+    el.classList.add("show");
+    setTimeout(() => el.classList.remove("show"), 2400);
+  }
+};
 
-function dueMeta(dateStr, completed) {
+function formatDue(dateStr, completed) {
   if (!dateStr || completed) return null;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const due = new Date(dateStr.split("T")[0] + "T00:00:00");
   const diff = Math.round((due - today) / 86400000);
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const label =
-    diff < 0
-      ? `Overdue · ${months[due.getMonth()]} ${due.getDate()}`
-      : diff === 0
-        ? "Today"
-        : diff === 1
-          ? "Tomorrow"
-          : `${months[due.getMonth()]} ${due.getDate()}`;
-  const cls = diff < 0 ? "overdue" : diff === 0 ? "today" : "";
-  return { label, cls };
+
+  if (diff < 0) return { label: "Vencida", cls: "overdue" };
+  if (diff === 0) return { label: "Hoy", cls: "today" };
+  return { label: `${due.getDate()}/${due.getMonth() + 1}`, cls: "" };
 }
 
-async function loadUser() {
+// --- CARGA DE DATOS ---
+async function loadAll() {
   try {
-    const res = await fetch("/tasks/me", { credentials: "include" });
-    if (!res.ok) {
-      showError(
-        `No se pudo cargar el usuario (status ${res.status}). ¿Estás autenticado?`,
-      );
-      return;
+    const [uRes, tRes] = await Promise.all([
+      fetch("/tasks/me", { credentials: "include" }),
+      fetch("/tasks/tasks", { credentials: "include" }),
+    ]);
+    if (uRes.ok) {
+      const user = await uRes.json();
+      document.getElementById("user-name").textContent = user.nombre;
+      document.getElementById("avatar").textContent = user.nombre
+        .charAt(0)
+        .toUpperCase();
     }
-    const user = await res.json();
-    document.getElementById("user-name").textContent = user.nombre;
-    document.getElementById("user-email").textContent = user.email || "";
-    document.getElementById("avatar").textContent = initials(user.nombre);
+    if (tRes.ok) {
+      allTasks = await tRes.json();
+      render();
+    }
   } catch (e) {
-    showError(`Error de red al cargar usuario: ${e.message}`);
+    console.error("Error:", e);
   }
 }
 
-document.getElementById("btn-logout").addEventListener("click", async () => {
-  await fetch("/log-in/logout", { method: "POST", credentials: "include" });
-  window.location.href = "/";
-});
-
-async function loadTasks() {
-  try {
-    const res = await fetch("/tasks/tasks", { credentials: "include" });
-    if (!res.ok) {
-      showError(
-        `No se pudieron cargar las tareas (status ${res.status}). ¿Estás autenticado?`,
-      );
-      return;
-    }
-    allTasks = await res.json();
-
-    allTasks.forEach((t) => {
-      const saved = sessionStorage.getItem("star_" + t.id);
-      if (saved !== null) t.destacada = saved === "1";
-    });
-    render();
-  } catch (e) {
-    showError(`Error de red al cargar tareas: ${e.message}`);
-  }
-}
-
-async function addTask() {
-  const input = document.getElementById("new-task-input");
-  const titulo = input.value.trim();
-  if (!titulo) return;
-  input.value = "";
-
-  const res = await fetch("/tasks/tasks", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ titulo }),
+// --- RENDERIZADO ---
+function render() {
+  const container = document.getElementById("tasks-list");
+  const filtered = allTasks.filter((t) => {
+    if (currentFilter === "pending") return !t.completed;
+    if (currentFilter === "done") return t.completed;
+    return true;
   });
-  if (!res.ok) {
-    toast("Error creating task");
-    return;
-  }
-  const task = await res.json();
-  allTasks.unshift(task);
-  render();
-  toast("Task added ✓");
+
+  container.innerHTML = filtered.length
+    ? filtered
+        .map((t) => {
+          const due = formatDue(t.due, t.completed);
+          return `
+        <div class="task-row ${t.completed ? "done" : ""}">
+            <div class="task-check ${t.completed ? "checked" : ""}" onclick="toggleTask(${t.id})"></div>
+            <div class="task-body">
+                <div class="task-title">${esc(t.title)}</div>
+                ${due ? `<div class="task-due ${due.cls}">${due.label}</div>` : ""}
+            </div>
+            <div class="task-actions">
+                <button onclick="openEdit(${t.id})" class="task-btn">✏️</button>
+                <button onclick="deleteTask(${t.id})" class="task-btn delete">🗑️</button>
+            </div>
+        </div>`;
+        })
+        .join("")
+    : `<div class="empty-state">No hay tareas aquí</div>`;
+
+  document.getElementById("count-all").textContent = allTasks.length;
+  document.getElementById("count-pending").textContent = allTasks.filter(
+    (t) => !t.completed,
+  ).length;
+  document.getElementById("count-done").textContent = allTasks.filter(
+    (t) => t.completed,
+  ).length;
 }
 
-async function toggleTask(id) {
+// --- ACCIONES ---
+window.toggleTask = async (id) => {
   const res = await fetch(`/tasks/tasks/${id}/toggle`, {
     method: "PATCH",
     credentials: "include",
   });
-  if (!res.ok) {
-    toast("Error");
-    return;
+  if (res.ok) {
+    const t = allTasks.find((x) => x.id === id);
+    if (t) t.completed = !t.completed;
+    render();
   }
-  const t = allTasks.find((x) => x.id === id);
-  if (t) t.completada = !t.completada;
-  render();
-}
+};
 
-function toggleStar(id) {
-  const t = allTasks.find((x) => x.id === id);
-  if (!t) return;
-  t.destacada = !t.destacada;
-  sessionStorage.setItem("star_" + id, t.destacada ? "1" : "0");
-
-  fetch(`/tasks/tasks/${id}/star`, { method: "PATCH", credentials: "include" });
-  render();
-}
-
-async function deleteTask(id) {
-  if (!confirm("Delete this task?")) return;
+window.deleteTask = async (id) => {
+  if (!confirm("¿Borrar tarea?")) return;
   const res = await fetch(`/tasks/tasks/${id}`, {
     method: "DELETE",
     credentials: "include",
   });
-  if (!res.ok) {
-    toast("Error deleting");
-    return;
+  if (res.ok) {
+    allTasks = allTasks.filter((x) => x.id !== id);
+    render();
   }
-  allTasks = allTasks.filter((x) => x.id !== id);
-  render();
-  toast("Task deleted");
-}
+};
 
-function openEdit(id) {
+window.openEdit = (id) => {
   const t = allTasks.find((x) => x.id === id);
   if (!t) return;
   document.getElementById("edit-id").value = t.id;
-  document.getElementById("edit-title").value = t.titulo;
-  document.getElementById("edit-desc").value = t.descripcion || "";
-  document.getElementById("edit-due").value = t.vence
-    ? t.vence.split("T")[0]
-    : "";
+  document.getElementById("edit-title").value = t.title;
+  document.getElementById("edit-desc").value = t.description || "";
+  document.getElementById("edit-due").value = t.due ? t.due.split("T")[0] : "";
   document.getElementById("modal-overlay").classList.add("open");
-}
-
-async function saveEdit() {
-  const id = parseInt(document.getElementById("edit-id").value);
-  const titulo = document.getElementById("edit-title").value.trim();
-  if (!titulo) {
-    toast("Title is required");
-    return;
-  }
-  const descripcion = document.getElementById("edit-desc").value.trim();
-  const vence = document.getElementById("edit-due").value;
-  const t = allTasks.find((x) => x.id === id);
-
-  const res = await fetch(`/tasks/tasks/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({
-      titulo,
-      descripcion,
-      vence,
-      completada: t?.completada || false,
-    }),
-  });
-  if (!res.ok) {
-    toast("Error saving");
-    return;
-  }
-  if (t) {
-    t.titulo = titulo;
-    t.descripcion = descripcion;
-    t.vence = vence || null;
-  }
-  closeModal();
-  render();
-  toast("Saved ✓");
-}
-
-function getFiltered() {
-  const q = (document.getElementById("search-input").value || "").toLowerCase();
-  let list = [...allTasks];
-
-  if (currentFilter === "pending") list = list.filter((t) => !t.completada);
-  if (currentFilter === "starred") list = list.filter((t) => t.destacada);
-  if (currentFilter === "done") list = list.filter((t) => t.completada);
-  if (q) list = list.filter((t) => (t.titulo || "").toLowerCase().includes(q));
-
-  if (sortMode === "date") {
-    list.sort((a, b) => {
-      if (!a.vence && !b.vence) return 0;
-      if (!a.vence) return 1;
-      if (!b.vence) return -1;
-      return a.vence.localeCompare(b.vence);
-    });
-  } else if (sortMode === "name") {
-    list.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
-  }
-
-  return list;
-}
-
-const emptyMessages = {
-  all: {
-    icon: "📝",
-    text: "No tienes tareas aún",
-    sub: "Agrega una tarea arriba para empezar",
-  },
-  pending: { icon: "⏳", text: "Sin tareas pendientes", sub: "¡Todo al día!" },
-  starred: {
-    icon: "⭐",
-    text: "Sin tareas destacadas",
-    sub: "Marca una tarea con ★ para verla aquí",
-  },
-  done: {
-    icon: "✅",
-    text: "Sin tareas completadas",
-    sub: "Completa alguna tarea para verla aquí",
-  },
 };
 
-function render() {
-  const list = getFiltered();
-  const container = document.getElementById("tasks-list");
+// --- EVENTOS ---
+document.addEventListener("DOMContentLoaded", () => {
+  loadAll();
 
-  if (list.length === 0) {
-    const em = emptyMessages[currentFilter] || emptyMessages.all;
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">${em.icon}</div>
-        <div class="empty-text">${em.text}</div>
-        <div class="empty-sub">${em.sub}</div>
-      </div>`;
-  } else {
-    container.innerHTML = list
-      .map((t) => {
-        const due = dueMeta(t.vence, t.completada);
-        return `
-        <div class="task-row${t.completada ? " done" : ""}">
-          <div class="task-check${t.completada ? " checked" : ""}" onclick="toggleTask(${t.id})"></div>
-          <div class="task-body">
-            <div class="task-title">${esc(t.titulo)}</div>
-            ${due ? `<div class="task-due ${due.cls}">${esc(due.label)}</div>` : ""}
-          </div>
-          <div class="task-actions">
-            <button class="task-btn" onclick="openEdit(${t.id})" title="Edit">✏️</button>
-            <button class="task-btn delete" onclick="deleteTask(${t.id})" title="Delete">🗑️</button>
-            <button class="star-btn${t.destacada ? " starred" : ""}" onclick="toggleStar(${t.id})">★</button>
-          </div>
-        </div>`;
-      })
-      .join("");
+  const btnAdd = document.getElementById("btn-add");
+  const inputAdd = document.getElementById("new-task-input");
+  const btnLogout = document.getElementById("btn-logout");
+  if (btnLogout) {
+    btnLogout.onclick = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await fetch("/log-in/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        window.location.href = "/login";
+      } catch (err) {
+        console.error("Error al cerrar sesión:", err);
+        window.location.href = "/login";
+      }
+    };
   }
 
-  document.getElementById("count-all").textContent = allTasks.length;
-  document.getElementById("count-pending").textContent = allTasks.filter(
-    (t) => !t.completada,
-  ).length;
-  document.getElementById("count-starred").textContent = allTasks.filter(
-    (t) => t.destacada,
-  ).length;
-  document.getElementById("count-done").textContent = allTasks.filter(
-    (t) => t.completada,
-  ).length;
-
-  const titles = {
-    all: "All tasks",
-    pending: "Pending",
-    starred: "Starred",
-    done: "Completed",
+  const addTask = async () => {
+    const val = inputAdd.value.trim();
+    if (!val) return;
+    const res = await fetch("/tasks/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ title: val }),
+    });
+    if (res.ok) {
+      const newTask = await res.json();
+      allTasks.unshift(newTask);
+      inputAdd.value = "";
+      render();
+    }
   };
-  document.getElementById("header-title").textContent =
-    titles[currentFilter] || "All tasks";
+
+  btnAdd.onclick = addTask;
+  inputAdd.onkeydown = (e) => {
+    if (e.key === "Enter") addTask();
+  };
+
+  document.getElementById("btn-save").onclick = async () => {
+    const id = document.getElementById("edit-id").value;
+    const t = allTasks.find((x) => x.id == id);
+    const payload = {
+      title: document.getElementById("edit-title").value,
+      description: document.getElementById("edit-desc").value,
+      due: document.getElementById("edit-due").value || null,
+      completed: t ? t.completed : false,
+    };
+    const res = await fetch(`/tasks/tasks/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      if (t) Object.assign(t, payload);
+      document.getElementById("modal-overlay").classList.remove("open");
+      render();
+    }
+  };
+
+  document.getElementById("menu-toggle").onclick = () => {
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("sidebar-overlay").classList.toggle("open");
+  };
+
+  document.getElementById("btn-cancel").onclick = () => {
+    document.getElementById("modal-overlay").classList.remove("open");
+  };
 
   document.querySelectorAll(".nav-item").forEach((el) => {
-    el.classList.toggle("active", el.dataset.filter === currentFilter);
-  });
-}
-
-function closeModal() {
-  document.getElementById("modal-overlay").classList.remove("open");
-}
-document.getElementById("btn-cancel").addEventListener("click", closeModal);
-document.getElementById("btn-save").addEventListener("click", saveEdit);
-document.getElementById("modal-overlay").addEventListener("click", (e) => {
-  if (e.target === document.getElementById("modal-overlay")) closeModal();
-});
-
-document.querySelectorAll(".nav-item[data-filter]").forEach((el) => {
-  el.addEventListener("click", () => {
-    currentFilter = el.dataset.filter;
-    closeSidebar();
-    render();
+    el.onclick = () => {
+      currentFilter = el.dataset.filter;
+      render();
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("sidebar-overlay").classList.remove("open");
+    };
   });
 });
-
-document.getElementById("btn-sort-date").addEventListener("click", function () {
-  sortMode = sortMode === "date" ? null : "date";
-  this.classList.toggle("active", sortMode === "date");
-  document.getElementById("btn-sort-name").classList.remove("active");
-  render();
-});
-
-document.getElementById("btn-sort-name").addEventListener("click", function () {
-  sortMode = sortMode === "name" ? null : "name";
-  this.classList.toggle("active", sortMode === "name");
-  document.getElementById("btn-sort-date").classList.remove("active");
-  render();
-});
-
-document.getElementById("search-input").addEventListener("input", render);
-
-document.getElementById("new-task-input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") addTask();
-});
-document.getElementById("btn-add").addEventListener("click", addTask);
-
-function closeSidebar() {
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("sidebar-overlay").classList.remove("open");
-}
-
-document.getElementById("menu-toggle").addEventListener("click", () => {
-  document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("sidebar-overlay").classList.toggle("open");
-});
-
-document
-  .getElementById("sidebar-overlay")
-  .addEventListener("click", closeSidebar);
-
-loadUser();
-loadTasks();
