@@ -4,6 +4,8 @@ const db = require("../bd/bd");
 
 // Auth middleware
 function auth(req, res, next) {
+  console.log("Session ID:", req.sessionID);
+  console.log("Session usuario:", req.session?.usuario);
   if (!req.session?.usuario)
     return res.status(401).json({ error: "Not authenticated" });
   next();

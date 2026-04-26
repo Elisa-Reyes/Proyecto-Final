@@ -2,6 +2,23 @@ let allTasks = [];
 let currentFilter = "all";
 let sortMode = null;
 
+function showError(msg) {
+  document.body.innerHTML = `
+    <div style="
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      height:100vh; font-family:sans-serif; background:#0f172a; color:#f87171;
+      padding:2rem; text-align:center;
+    ">
+      <div style="font-size:3rem; margin-bottom:1rem;">⚠️</div>
+      <div style="font-size:1.2rem; font-weight:bold; margin-bottom:0.5rem;">Algo salió mal</div>
+      <div style="font-size:0.95rem; color:#fca5a5; max-width:400px;">${msg}</div>
+      <a href="/login" style="
+        margin-top:1.5rem; padding:0.6rem 1.4rem; background:#3b82f6;
+        color:white; border-radius:8px; text-decoration:none; font-size:0.9rem;
+      ">Ir al login</a>
+    </div>`;
+}
+
 function toast(msg, ms = 2400) {
   const el = document.getElementById("toast");
   el.textContent = msg;
@@ -63,15 +80,17 @@ async function loadUser() {
   try {
     const res = await fetch("/tasks/me", { credentials: "include" });
     if (!res.ok) {
-      window.location.href = "/login";
+      showError(
+        `No se pudo cargar el usuario (status ${res.status}). ¿Estás autenticado?`,
+      );
       return;
     }
     const user = await res.json();
     document.getElementById("user-name").textContent = user.nombre;
     document.getElementById("user-email").textContent = user.email || "";
     document.getElementById("avatar").textContent = initials(user.nombre);
-  } catch {
-    window.location.href = "/login";
+  } catch (e) {
+    showError(`Error de red al cargar usuario: ${e.message}`);
   }
 }
 
@@ -84,7 +103,9 @@ async function loadTasks() {
   try {
     const res = await fetch("/tasks/tasks", { credentials: "include" });
     if (!res.ok) {
-      window.location.href = "/login";
+      showError(
+        `No se pudieron cargar las tareas (status ${res.status}). ¿Estás autenticado?`,
+      );
       return;
     }
     allTasks = await res.json();
@@ -94,8 +115,8 @@ async function loadTasks() {
       if (saved !== null) t.destacada = saved === "1";
     });
     render();
-  } catch {
-    toast("Error loading tasks");
+  } catch (e) {
+    showError(`Error de red al cargar tareas: ${e.message}`);
   }
 }
 
@@ -231,15 +252,36 @@ function getFiltered() {
   return list;
 }
 
+const emptyMessages = {
+  all: {
+    icon: "📝",
+    text: "No tienes tareas aún",
+    sub: "Agrega una tarea arriba para empezar",
+  },
+  pending: { icon: "⏳", text: "Sin tareas pendientes", sub: "¡Todo al día!" },
+  starred: {
+    icon: "⭐",
+    text: "Sin tareas destacadas",
+    sub: "Marca una tarea con ★ para verla aquí",
+  },
+  done: {
+    icon: "✅",
+    text: "Sin tareas completadas",
+    sub: "Completa alguna tarea para verla aquí",
+  },
+};
+
 function render() {
   const list = getFiltered();
   const container = document.getElementById("tasks-list");
 
   if (list.length === 0) {
+    const em = emptyMessages[currentFilter] || emptyMessages.all;
     container.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">📭</div>
-        <div class="empty-text">No tasks here</div>
+        <div class="empty-icon">${em.icon}</div>
+        <div class="empty-text">${em.text}</div>
+        <div class="empty-sub">${em.sub}</div>
       </div>`;
   } else {
     container.innerHTML = list

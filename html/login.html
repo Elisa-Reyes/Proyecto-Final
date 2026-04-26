@@ -68,7 +68,7 @@
           const data = await res.json();
 
           if (res.ok) {
-            window.location.href = "/main";
+            window.location.href = "/todo";
           } else {
             showError(data.error || "Login failed");
           }

@@ -1,5 +1,4 @@
 const bcrypt = require("bcrypt");
-const session = require("express-session");
 const express = require("express");
 const router = express.Router();
 const db = require("../bd/bd");
@@ -24,7 +23,10 @@ router.post("/login", (req, res) => {
         id: usuario.id,
         nombre: usuario.nombre,
       };
-      return res.json({ message: "Login correcto" });
+      req.session.save((err) => {
+        if (err) return res.status(500).json({ error: "Session error" });
+        res.json({ message: "Login correcto" });
+      });
     } else {
       return res.status(401).json({ error: "Contraseña incorrecta" });
     }
