@@ -29,6 +29,19 @@ function formatDue(dateStr, completed) {
   return { label: `${due.getDate()}/${due.getMonth() + 1}`, cls: "" };
 }
 
+// --- NUEVO: Actualiza los números en la barra lateral ---
+function updateCounts() {
+  const countAll = document.getElementById("count-all");
+  const countPending = document.getElementById("count-pending");
+  const countDone = document.getElementById("count-done");
+
+  if (countAll) countAll.textContent = allTasks.length;
+  if (countPending)
+    countPending.textContent = allTasks.filter((t) => !t.completed).length;
+  if (countDone)
+    countDone.textContent = allTasks.filter((t) => t.completed).length;
+}
+
 // --- CARGA DE DATOS ---
 async function loadAll() {
   try {
@@ -48,17 +61,31 @@ async function loadAll() {
       render();
     }
   } catch (e) {
-    console.error("Error:", e);
+    console.error("Error cargando datos:", e);
   }
 }
 
-// --- RENDERIZADO ---
+// --- RENDERIZADO CORREGIDO ---
 function render() {
   const container = document.getElementById("tasks-list");
+  if (!container) return;
+
+  const searchInput = document.getElementById("search-input");
+  const searchQuery = searchInput ? searchInput.value.toLowerCase() : "";
+
   const filtered = allTasks.filter((t) => {
-    if (currentFilter === "pending") return !t.completed;
-    if (currentFilter === "done") return t.completed;
-    return true;
+    // Filtro por categoría lateral
+    const matchesFilter =
+      currentFilter === "all" ||
+      (currentFilter === "pending" && !t.completed) ||
+      (currentFilter === "done" && t.completed);
+
+    // Filtro por texto de búsqueda
+    const matchesSearch =
+      t.title.toLowerCase().includes(searchQuery) ||
+      (t.description && t.description.toLowerCase().includes(searchQuery));
+
+    return matchesFilter && matchesSearch;
   });
 
   container.innerHTML = filtered.length
@@ -79,15 +106,9 @@ function render() {
         </div>`;
         })
         .join("")
-    : `<div class="empty-state">No hay tareas aquí</div>`;
+    : `<div class="empty-state">No se encontraron tareas</div>`;
 
-  document.getElementById("count-all").textContent = allTasks.length;
-  document.getElementById("count-pending").textContent = allTasks.filter(
-    (t) => !t.completed,
-  ).length;
-  document.getElementById("count-done").textContent = allTasks.filter(
-    (t) => t.completed,
-  ).length;
+  updateCounts();
 }
 
 // --- ACCIONES ---
@@ -131,24 +152,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const btnAdd = document.getElementById("btn-add");
   const inputAdd = document.getElementById("new-task-input");
+
+  // Logout
   const btnLogout = document.getElementById("btn-logout");
   if (btnLogout) {
     btnLogout.onclick = async (e) => {
       e.preventDefault();
-      try {
-        const res = await fetch("/log-in/logout", {
-          method: "POST",
-          credentials: "include",
-        });
-
-        window.location.href = "/login";
-      } catch (err) {
-        console.error("Error al cerrar sesión:", err);
-        window.location.href = "/login";
-      }
+      await fetch("/log-in/logout", { method: "POST", credentials: "include" });
+      window.location.href = "/login";
     };
   }
 
+  // Búsqueda en tiempo real
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", render);
+  }
+
+  // Agregar Tarea
   const addTask = async () => {
     const val = inputAdd.value.trim();
     if (!val) return;
@@ -166,11 +187,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  btnAdd.onclick = addTask;
+  if (btnAdd) {
+    btnAdd.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      addTask();
+    });
+  }
   inputAdd.onkeydown = (e) => {
     if (e.key === "Enter") addTask();
   };
 
+  // Guardar Edición
   document.getElementById("btn-save").onclick = async () => {
     const id = document.getElementById("edit-id").value;
     const t = allTasks.find((x) => x.id == id);
@@ -193,6 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  // UI (Menú y Modal)
   document.getElementById("menu-toggle").onclick = () => {
     document.getElementById("sidebar").classList.toggle("open");
     document.getElementById("sidebar-overlay").classList.toggle("open");
@@ -202,9 +230,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("modal-overlay").classList.remove("open");
   };
 
+  // Filtros de navegación
   document.querySelectorAll(".nav-item").forEach((el) => {
     el.onclick = () => {
       currentFilter = el.dataset.filter;
+      // Resaltar el item activo visualmente (opcional)
+      document
+        .querySelectorAll(".nav-item")
+        .forEach((nav) => nav.classList.remove("active"));
+      el.classList.add("active");
+
       render();
       document.getElementById("sidebar").classList.remove("open");
       document.getElementById("sidebar-overlay").classList.remove("open");

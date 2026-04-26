@@ -87,3 +87,53 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .todote {
+    padding: 30px;
+    max-width: 300px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  input[type="password"],
+  [type="email"] {
+    padding: 10px;
+  }
+
+  button {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .todote {
+    padding: 20px;
+    max-width: 280px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  label {
+    font-size: 13px;
+  }
+
+  input[type="password"],
+  [type="email"] {
+    padding: 8px;
+  }
+
+  button {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  a {
+    font-size: 13px;
+  }
+}

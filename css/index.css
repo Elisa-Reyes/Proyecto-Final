@@ -55,3 +55,37 @@ button:hover {
   transform: scale(1.03);
   opacity: 0.9;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .todo {
+    padding: 20px;
+  }
+
+  .logo img {
+    width: 150px;
+    margin-bottom: 20px;
+  }
+
+  button {
+    width: 250px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .todo {
+    padding: 15px;
+  }
+
+  .logo img {
+    width: 120px;
+    margin-bottom: 15px;
+  }
+
+  button {
+    width: 200px;
+    padding: 8px;
+    font-size: 14px;
+  }
+}

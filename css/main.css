@@ -13,7 +13,7 @@
   --font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ── Reset ─────────────────────────────────────────────── */
+/* ── Reset y Base (CRÍTICO PARA MÓVIL) ────────────────── */
 *,
 *::before,
 *::after {
@@ -26,12 +26,14 @@ body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  height: 100vh;
+  /* dvh evita que las barras del navegador móvil escondan el diseño */
+  height: 100dvh;
+  width: 100vw;
   display: flex;
-  overflow: hidden;
+  overflow: hidden; /* Prohíbe el scroll en toda la pantalla */
 }
 
-/* ── Sidebar overlay (mobile) ──────────────────────────── */
+/* ── Sidebar y Overlay ─────────────────────────────────── */
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -43,7 +45,6 @@ body {
   display: block;
 }
 
-/* ── Sidebar ───────────────────────────────────────────── */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--surface);
@@ -55,7 +56,6 @@ body {
   z-index: 100;
 }
 
-/* ── Sidebar header ────────────────────────────────────── */
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -89,11 +89,9 @@ body {
   margin-top: 2px;
 }
 
-/* ── Search ────────────────────────────────────────────── */
 .search-wrap {
   padding: 16px 16px 8px;
 }
-
 .search-box {
   display: flex;
   align-items: center;
@@ -102,32 +100,19 @@ body {
   border: 1.5px solid var(--light);
   border-radius: 8px;
   padding: 8px 12px;
-  transition: border-color 0.2s;
 }
-.search-box:focus-within {
-  border-color: var(--primary);
-}
-
-.search-icon {
-  font-size: 0.9rem;
-}
-
 .search-box input {
   border: none;
   background: transparent;
   outline: none;
-  font-size: 0.88rem;
-  font-family: var(--font);
-  color: var(--text);
   width: 100%;
 }
 
-/* ── Nav ───────────────────────────────────────────────── */
 .nav-section {
   padding: 8px 12px;
   flex: 1;
+  overflow-y: auto;
 }
-
 .nav-item {
   display: flex;
   align-items: center;
@@ -135,52 +120,23 @@ body {
   padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s;
-  margin-bottom: 2px;
-}
-.nav-item:hover {
-  background: #f0f4ff;
 }
 .nav-item.active {
   background: #dbeafe;
   color: var(--primary-d);
   font-weight: 600;
 }
-
-.nav-icon {
-  font-size: 1rem;
-  width: 20px;
-  text-align: center;
-}
-.nav-label {
-  flex: 1;
-  font-size: 0.9rem;
-}
 .nav-count {
   font-size: 0.78rem;
   background: var(--light);
-  color: var(--muted);
   border-radius: 99px;
   padding: 1px 8px;
-  font-weight: 600;
-}
-.nav-item.active .nav-count {
-  background: var(--primary);
-  color: #fff;
 }
 
-.nav-divider {
-  height: 1px;
-  background: var(--light);
-  margin: 8px 4px;
-}
-
-/* ── Sidebar footer ────────────────────────────────────── */
 .sidebar-footer {
   padding: 16px;
   border-top: 1px solid var(--light);
 }
-
 .btn-logout {
   width: 100%;
   display: flex;
@@ -191,28 +147,19 @@ body {
   border: 1.5px solid var(--light);
   border-radius: 8px;
   background: transparent;
-  color: var(--muted);
-  font-size: 0.88rem;
-  font-family: var(--font);
   cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-logout:hover {
-  border-color: var(--danger);
-  color: var(--danger);
-  background: #fff5f5;
 }
 
-/* ── Main area ─────────────────────────────────────────── */
+/* ── Main Area (ESTRUCTURA DE CONTENEDOR) ──────────────── */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  height: 100%; /* Usa el 100% de los 100dvh del body */
   min-width: 0;
+  overflow: hidden; /* Obligatorio para que los hijos controlen el scroll */
 }
 
-/* ── Main header ───────────────────────────────────────── */
 .main-header {
   display: flex;
   align-items: center;
@@ -220,6 +167,7 @@ body {
   padding: 18px 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--light);
+  flex-shrink: 0; /* No se encoge */
 }
 
 .menu-toggle {
@@ -227,18 +175,8 @@ body {
   background: none;
   border: none;
   font-size: 1.2rem;
-  cursor: pointer;
-  color: var(--muted);
-  padding: 4px 6px;
-  border-radius: 6px;
-}
-.menu-toggle:hover {
-  background: var(--light);
 }
 
-.header-icon {
-  font-size: 1.1rem;
-}
 .header-title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -246,42 +184,17 @@ body {
   color: var(--primary-d);
 }
 
-.header-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.hbtn {
-  background: none;
-  border: 1.5px solid var(--light);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: var(--muted);
-}
-.hbtn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-.hbtn.active {
-  border-color: var(--primary);
-  background: #dbeafe;
-  color: var(--primary-d);
-}
-
-/* ── Tasks area ────────────────────────────────────────── */
+/* ── Tasks Area (EL ÚNICO CON SCROLL) ──────────────────── */
 .tasks-area {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1; /* Absorbe todo el espacio central */
+  overflow-y: auto; /* Aquí es donde ocurre el scroll */
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* ── Task row ──────────────────────────────────────────── */
 .task-row {
   display: flex;
   align-items: center;
@@ -290,33 +203,19 @@ body {
   border: 1.5px solid var(--light);
   border-radius: var(--radius);
   padding: 12px 14px;
-  transition:
-    box-shadow 0.15s,
-    border-color 0.15s;
-}
-.task-row:hover {
-  box-shadow: 0 2px 8px rgba(53, 115, 182, 0.1);
-  border-color: #bee3f8;
 }
 .task-row.done {
   opacity: 0.55;
 }
-
-/* checkbox */
 .task-check {
   width: 20px;
   height: 20px;
   border-radius: 50%;
   border: 2px solid var(--light);
-  flex-shrink: 0;
   cursor: pointer;
-  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.task-check:hover {
-  border-color: var(--primary);
 }
 .task-check.checked {
   background: var(--primary);
@@ -326,120 +225,28 @@ body {
   content: "✓";
   color: #fff;
   font-size: 0.7rem;
-  font-weight: 700;
-}
-
-.task-body {
-  flex: 1;
-  min-width: 0;
 }
 .task-title {
   font-size: 0.92rem;
   font-weight: 500;
-  white-space: nowrap;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .task-row.done .task-title {
   text-decoration: line-through;
-  color: var(--muted);
 }
 
-/* due badges */
-.task-due {
-  font-size: 0.75rem;
-  margin-top: 3px;
-  color: var(--muted);
-}
-.task-due.overdue {
-  color: #e53e3e;
-  font-weight: 600;
-}
-.task-due.today {
-  color: #d97706;
-  font-weight: 600;
-}
-
-/* action buttons */
-.task-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.task-btn {
-  background: none;
-  border: none;
-  padding: 5px 7px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  opacity: 0.5;
-  transition:
-    opacity 0.15s,
-    background 0.15s;
-}
-.task-btn:hover {
-  opacity: 1;
-  background: var(--light);
-}
-.task-btn.delete:hover {
-  background: #fff5f5;
-}
-
-.star-btn {
-  background: none;
-  border: none;
-  font-size: 1.1rem;
-  cursor: pointer;
-  color: var(--light);
-  transition:
-    color 0.15s,
-    transform 0.15s;
-  padding: 4px;
-  line-height: 1;
-}
-.star-btn:hover {
-  color: #f6ad55;
-  transform: scale(1.2);
-}
-.star-btn.starred {
-  color: #f6ad55;
-}
-
-/* ── Empty state ───────────────────────────────────────── */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  padding: 60px 20px;
-  text-align: center;
-}
-.empty-icon {
-  font-size: 2.8rem;
-  margin-bottom: 12px;
-}
-.empty-text {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-.empty-sub {
-  font-size: 0.83rem;
-  color: #a0aec0;
-  margin-top: 6px;
-}
-
-/* ── Add bar ───────────────────────────────────────────── */
+/* ── Add Bar (SIEMPRE VISIBLE ABAJO) ───────────────────── */
 .add-bar {
   display: flex;
   gap: 10px;
   padding: 16px 24px;
   background: var(--surface);
   border-top: 1px solid var(--light);
+  flex-shrink: 0; /* Prohibido que el navegador lo esconda o achique */
+  z-index: 10;
 }
 
 .add-bar input {
@@ -448,15 +255,8 @@ body {
   border: 1.5px solid var(--light);
   border-radius: 8px;
   font-size: 0.9rem;
-  font-family: var(--font);
   background: #f8fafc;
   outline: none;
-  transition: border-color 0.2s;
-  color: var(--text);
-}
-.add-bar input:focus {
-  border-color: var(--primary);
-  background: #fff;
 }
 
 .add-plus {
@@ -471,17 +271,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  transition:
-    background 0.2s,
-    transform 0.15s;
-}
-.add-plus:hover {
-  background: var(--primary-d);
-  transform: scale(1.08);
 }
 
-/* ── Modal ─────────────────────────────────────────────── */
+/* ── Modales y Toast ───────────────────────────────────── */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -494,123 +286,40 @@ body {
 .modal-overlay.open {
   display: flex;
 }
-
 .modal {
   background: var(--surface);
   border-radius: var(--radius);
   padding: 28px;
-  width: 100%;
+  width: 90%;
   max-width: 420px;
-  margin: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
-
-.modal h2 {
-  font-size: 1.1rem;
-  color: var(--primary-d);
-  margin-bottom: 20px;
-}
-
 .modal-field {
   display: flex;
   flex-direction: column;
   gap: 5px;
   margin-bottom: 14px;
 }
-
-.modal-field label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.modal-field input,
-.modal-field textarea {
-  padding: 10px 12px;
-  border: 1.5px solid var(--light);
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-family: var(--font);
-  background: #f8fafc;
-  outline: none;
-  transition: border-color 0.2s;
-  color: var(--text);
-}
-.modal-field input:focus,
-.modal-field textarea:focus {
-  border-color: var(--primary);
-  background: #fff;
-}
-
-.modal-field textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
 .modal-actions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-  margin-top: 20px;
 }
 
-.btn-cancel {
-  padding: 9px 18px;
-  border: 1.5px solid var(--light);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--muted);
-  font-family: var(--font);
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-cancel:hover {
-  border-color: var(--muted);
-  color: var(--text);
-}
-
-.btn-save {
-  padding: 9px 18px;
-  border: none;
-  border-radius: 8px;
-  background: var(--primary);
-  color: #fff;
-  font-family: var(--font);
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.15s;
-}
-.btn-save:hover {
-  background: var(--primary-d);
-  transform: scale(1.02);
-}
-
-/* ── Toast ─────────────────────────────────────────────── */
 .toast {
   position: fixed;
-  bottom: 24px;
+  bottom: 80px;
   left: 50%;
-  transform: translateX(-50%) translateY(20px);
+  transform: translateX(-50%);
   background: #1a202c;
   color: #fff;
   padding: 10px 20px;
   border-radius: 99px;
-  font-size: 0.88rem;
   opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 0.25s,
-    transform 0.25s;
+  transition: opacity 0.25s;
   z-index: 300;
-  white-space: nowrap;
 }
 .toast.show {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 
 /* ── Mobile ────────────────────────────────────────────── */
@@ -628,13 +337,17 @@ body {
   .menu-toggle {
     display: flex;
   }
+
+  .main-header {
+    padding: 14px 16px;
+  }
   .tasks-area {
     padding: 14px 16px;
   }
+
   .add-bar {
     padding: 12px 16px;
-  }
-  .main-header {
-    padding: 14px 16px;
+    /* Evita que el área segura del iPhone oculte la barra */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
   }
 }

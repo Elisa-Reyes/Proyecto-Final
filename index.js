@@ -52,6 +52,6 @@ app.get("/todo", (req, res) => {
 
 app.use(express.static(__dirname));
 
-app.listen(3000, () => {
+app.listen(3000, "0.0.0.0", () => {
   console.log("servidor funcionando en http://localhost:3000 :p");
 });
