@@ -28,6 +28,7 @@
           <input type="submit" value="Submit" />
         </form>
       </div>
+      <p class="switch">No account? <a href="/registro">Sign up</a></p>
       <a href="../index.html">Return</a>
     </div>
     <script>
@@ -42,7 +43,7 @@
         });
         const result = await response.text();
         if (response.ok) {
-          window.location.href = "/";
+          window.location.href = "../html/main.html";
         } else {
           alert("Wrong password/e-mail" + result);
         }
