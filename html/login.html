@@ -37,7 +37,6 @@
       const form = document.getElementById("login-form");
       const errEl = document.getElementById("error-msg");
       const btn = document.getElementById("btn-submit");
-      const text = await res.text();
 
       function showError(msg) {
         errEl.textContent = msg;
@@ -65,6 +64,7 @@
             body: JSON.stringify({ email, password }),
             credentials: "include",
           });
+
           const data = await res.json();
 
           if (res.ok) {
@@ -73,7 +73,7 @@
             showError(data.error || "Login failed");
           }
         } catch (err) {
-          showError("Network error" + err.message);
+          showError("Network error: " + err.message);
         } finally {
           btn.textContent = "Log in";
           btn.disabled = false;
