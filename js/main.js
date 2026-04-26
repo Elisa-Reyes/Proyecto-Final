@@ -1,7 +1,6 @@
 let allTasks = [];
 let currentFilter = "all";
 
-// --- UTILIDADES ---
 const esc = (s) =>
   String(s || "")
     .replace(/&/g, "&amp;")
@@ -41,7 +40,6 @@ function updateCounts() {
     countDone.textContent = allTasks.filter((t) => t.completed).length;
 }
 
-// --- CARGA DE DATOS ---
 async function loadAll() {
   try {
     const [uRes, tRes] = await Promise.all([
@@ -64,7 +62,6 @@ async function loadAll() {
   }
 }
 
-// --- RENDERIZADO CORREGIDO ---
 function render() {
   const container = document.getElementById("tasks-list");
   if (!container) return;
@@ -108,7 +105,6 @@ function render() {
   updateCounts();
 }
 
-// --- ACCIONES ---
 window.toggleTask = async (id) => {
   const res = await fetch(`/tasks/tasks/${id}/toggle`, {
     method: "PATCH",
@@ -143,7 +139,6 @@ window.openEdit = (id) => {
   document.getElementById("modal-overlay").classList.add("open");
 };
 
-// --- EVENTOS ---
 document.addEventListener("DOMContentLoaded", () => {
   loadAll();
 
@@ -231,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".nav-item").forEach((el) => {
     el.onclick = () => {
       currentFilter = el.dataset.filter;
-      // Resaltar el item activo visualmente (opcional)
       document
         .querySelectorAll(".nav-item")
         .forEach((nav) => nav.classList.remove("active"));

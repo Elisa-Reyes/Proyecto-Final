@@ -1,4 +1,3 @@
-/* ── Variables ─────────────────────────────────────────── */
 :root {
   --bg: #d4e7fb;
   --surface: #ffffff;
@@ -13,7 +12,6 @@
   --font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ── Reset ─────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -22,7 +20,6 @@
   padding: 0;
 }
 
-/* html y body: exactamente la pantalla visible, sin scroll */
 html,
 body {
   height: 100dvh;
@@ -36,7 +33,6 @@ body {
   display: flex;
 }
 
-/* ── Sidebar Overlay ───────────────────────────────────── */
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -48,7 +44,6 @@ body {
   display: block;
 }
 
-/* ── Sidebar ───────────────────────────────────────────── */
 .sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
@@ -115,7 +110,6 @@ body {
   width: 100%;
 }
 
-/* nav toma el espacio libre y hace scroll interno */
 .nav-section {
   flex: 1;
   min-height: 0;
@@ -142,7 +136,6 @@ body {
   padding: 1px 8px;
 }
 
-/* Footer siempre visible, con safe-area para iPhone */
 .sidebar-footer {
   flex-shrink: 0;
   border-top: 1px solid var(--light);
@@ -162,7 +155,6 @@ body {
   cursor: pointer;
 }
 
-/* ── Main ──────────────────────────────────────────────── */
 .main {
   flex: 1;
   min-width: 0;
@@ -197,7 +189,6 @@ body {
   color: var(--primary-d);
 }
 
-/* ── Tasks: único elemento con scroll ─────────────────── */
 .tasks-area {
   flex: 1;
   min-height: 0;
@@ -254,7 +245,6 @@ body {
   text-decoration: line-through;
 }
 
-/* ── Add Bar: siempre visible al fondo ────────────────── */
 .add-bar {
   flex-shrink: 0;
   display: flex;
@@ -290,7 +280,6 @@ body {
   justify-content: center;
 }
 
-/* ── Modal y Toast ─────────────────────────────────────── */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -339,7 +328,6 @@ body {
   opacity: 1;
 }
 
-/* ── Mobile ────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .sidebar {
     position: fixed;

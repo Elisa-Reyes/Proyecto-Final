@@ -13,7 +13,6 @@ router.get("/me", auth, (req, res) => {
   res.json(req.session.usuario);
 });
 
-// GET /tasks/tasks - Cambiado 'creada_en' por 'id' ya que no está en tu SQL
 router.get("/tasks", auth, (req, res) => {
   db.query(
     "SELECT * FROM tasks WHERE usuario_id = ? ORDER BY id DESC",
@@ -25,7 +24,6 @@ router.get("/tasks", auth, (req, res) => {
   );
 });
 
-// POST /tasks/tasks - Usando 'title', 'description', 'due'
 router.post("/tasks", auth, (req, res) => {
   const { title, description, due } = req.body;
   if (!title) return res.status(400).json({ error: "Title is required" });
@@ -46,7 +44,6 @@ router.post("/tasks", auth, (req, res) => {
   );
 });
 
-// PATCH /toggle - Usando 'completed'
 router.patch("/tasks/:id/toggle", auth, (req, res) => {
   db.query(
     "UPDATE tasks SET completed = NOT completed WHERE id = ? AND usuario_id = ?",
@@ -58,7 +55,6 @@ router.patch("/tasks/:id/toggle", auth, (req, res) => {
   );
 });
 
-// PUT /tasks/:id - Update completo
 router.put("/tasks/:id", auth, (req, res) => {
   const { title, description, due, completed } = req.body;
   if (!title) return res.status(400).json({ error: "Title required" });
