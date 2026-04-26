@@ -13,7 +13,7 @@
   --font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ── Reset y Base (CRÍTICO PARA MÓVIL) ────────────────── */
+/* ── Reset ─────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -22,18 +22,21 @@
   padding: 0;
 }
 
+/* html y body: exactamente la pantalla visible, sin scroll */
+html,
+body {
+  height: 100dvh;
+  overflow: hidden;
+}
+
 body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  /* dvh evita que las barras del navegador móvil escondan el diseño */
-  height: 100dvh;
-  width: 100vw;
   display: flex;
-  overflow: hidden; /* Prohíbe el scroll en toda la pantalla */
 }
 
-/* ── Sidebar y Overlay ─────────────────────────────────── */
+/* ── Sidebar Overlay ───────────────────────────────────── */
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -45,18 +48,21 @@ body {
   display: block;
 }
 
+/* ── Sidebar ───────────────────────────────────────────── */
 .sidebar {
   width: var(--sidebar-w);
+  flex-shrink: 0;
   background: var(--surface);
+  border-right: 1px solid var(--light);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--light);
-  flex-shrink: 0;
-  transition: transform 0.25s ease;
+  height: 100dvh;
   z-index: 100;
+  transition: transform 0.25s ease;
 }
 
 .sidebar-header {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -90,6 +96,7 @@ body {
 }
 
 .search-wrap {
+  flex-shrink: 0;
   padding: 16px 16px 8px;
 }
 .search-box {
@@ -108,10 +115,12 @@ body {
   width: 100%;
 }
 
+/* nav toma el espacio libre y hace scroll interno */
 .nav-section {
-  padding: 8px 12px;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  padding: 8px 12px;
 }
 .nav-item {
   display: flex;
@@ -133,9 +142,12 @@ body {
   padding: 1px 8px;
 }
 
+/* Footer siempre visible, con safe-area para iPhone */
 .sidebar-footer {
-  padding: 16px;
+  flex-shrink: 0;
   border-top: 1px solid var(--light);
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 .btn-logout {
   width: 100%;
@@ -150,24 +162,24 @@ body {
   cursor: pointer;
 }
 
-/* ── Main Area (ESTRUCTURA DE CONTENEDOR) ──────────────── */
+/* ── Main ──────────────────────────────────────────────── */
 .main {
   flex: 1;
+  min-width: 0;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  height: 100%; /* Usa el 100% de los 100dvh del body */
-  min-width: 0;
-  overflow: hidden; /* Obligatorio para que los hijos controlen el scroll */
+  overflow: hidden;
 }
 
 .main-header {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 18px 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--light);
-  flex-shrink: 0; /* No se encoge */
 }
 
 .menu-toggle {
@@ -175,6 +187,7 @@ body {
   background: none;
   border: none;
   font-size: 1.2rem;
+  cursor: pointer;
 }
 
 .header-title {
@@ -184,18 +197,20 @@ body {
   color: var(--primary-d);
 }
 
-/* ── Tasks Area (EL ÚNICO CON SCROLL) ──────────────────── */
+/* ── Tasks: único elemento con scroll ─────────────────── */
 .tasks-area {
-  flex: 1; /* Absorbe todo el espacio central */
-  overflow-y: auto; /* Aquí es donde ocurre el scroll */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  -webkit-overflow-scrolling: touch;
 }
 
 .task-row {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -208,6 +223,7 @@ body {
   opacity: 0.55;
 }
 .task-check {
+  flex-shrink: 0;
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -238,15 +254,15 @@ body {
   text-decoration: line-through;
 }
 
-/* ── Add Bar (SIEMPRE VISIBLE ABAJO) ───────────────────── */
+/* ── Add Bar: siempre visible al fondo ────────────────── */
 .add-bar {
+  flex-shrink: 0;
   display: flex;
   gap: 10px;
   padding: 16px 24px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
   background: var(--surface);
   border-top: 1px solid var(--light);
-  flex-shrink: 0; /* Prohibido que el navegador lo esconda o achique */
-  z-index: 10;
 }
 
 .add-bar input {
@@ -260,6 +276,7 @@ body {
 }
 
 .add-plus {
+  flex-shrink: 0;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -273,7 +290,7 @@ body {
   justify-content: center;
 }
 
-/* ── Modales y Toast ───────────────────────────────────── */
+/* ── Modal y Toast ─────────────────────────────────────── */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -329,11 +346,13 @@ body {
     top: 0;
     left: 0;
     bottom: 0;
+    height: 100dvh;
     transform: translateX(-100%);
   }
   .sidebar.open {
     transform: translateX(0);
   }
+
   .menu-toggle {
     display: flex;
   }
@@ -341,13 +360,13 @@ body {
   .main-header {
     padding: 14px 16px;
   }
+
   .tasks-area {
     padding: 14px 16px;
   }
 
   .add-bar {
     padding: 12px 16px;
-    /* Evita que el área segura del iPhone oculte la barra */
-    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
 }

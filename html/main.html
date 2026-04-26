@@ -2,10 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <link rel="stylesheet" href="/css/main.css" />
     <script src="/js/main.js"></script>
     <title>Dot — Tasks</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+      body {
+        display: flex;
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .tasks-area {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+      }
+      .add-bar {
+        flex-shrink: 0;
+      }
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+      }
+      .nav-section {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+      }
+      .sidebar-footer {
+        flex-shrink: 0;
+      }
+    </style>
   </head>
   <body>
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -96,5 +137,22 @@
     </div>
 
     <div class="toast" id="toast"></div>
+
+    <script>
+      function fixHeight() {
+        var h = window.visualViewport
+          ? window.visualViewport.height
+          : window.innerHeight;
+        document.documentElement.style.setProperty("--real-vh", h + "px");
+        document.body.style.height = h + "px";
+        document.querySelector(".sidebar").style.height = h + "px";
+        document.querySelector(".main").style.height = h + "px";
+      }
+      fixHeight();
+      window.addEventListener("resize", fixHeight);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", fixHeight);
+      }
+    </script>
   </body>
 </html>
