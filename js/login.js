@@ -7,21 +7,26 @@ const db = require("../bd/bd");
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
   const sql = "SELECT * FROM usuarios WHERE email = ?";
+
   db.query(sql, [email], async (err, results) => {
-    if (results.length === 0) {
-      return res.status(401).send("Usuario no encontrado");
+    if (err) {
+      return res.status(500).json({ error: "Database error" });
     }
+    if (results.length === 0) {
+      return res.status(401).json({ error: "Usuario no encontrado" });
+    }
+
     const usuario = results[0];
     const match = await bcrypt.compare(password, usuario.password);
+
     if (match) {
       req.session.usuario = {
         id: usuario.id,
         nombre: usuario.nombre,
       };
-      res.send("Login correcto");
-      console.log("ok si");
+      return res.json({ message: "Login correcto" });
     } else {
-      res.status(401).send("Contraseña incorrecta");
+      return res.status(401).json({ error: "Contraseña incorrecta" });
     }
   });
 });
