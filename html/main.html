@@ -4,17 +4,109 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../css/main.css" />
-    <title>Document</title>
+    <title>Dot — Tasks</title>
   </head>
   <body>
-    <div class="todo">
-      <div class="header">
-        <img src="../assets/Dot (1).png" />
-        <h1>Welcome to your To-do list!</h1>
-        <input type="submit" value="Log out" />
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="avatar" id="avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name">…</div>
+          <div class="user-email" id="user-email"></div>
+        </div>
       </div>
-      <div class="cu"></div>
-      <div class="ed"></div>
+
+      <div class="search-wrap">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Search tasks…" />
+        </div>
+      </div>
+
+      <nav class="nav-section">
+        <div class="nav-item" data-filter="all">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">All tasks</span>
+          <span class="nav-count" id="count-all">0</span>
+        </div>
+        <div class="nav-item" data-filter="pending">
+          <span class="nav-icon">⏳</span>
+          <span class="nav-label">Pending</span>
+          <span class="nav-count" id="count-pending">0</span>
+        </div>
+        <div class="nav-item" data-filter="starred">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-label">Starred</span>
+          <span class="nav-count" id="count-starred">0</span>
+        </div>
+        <div class="nav-divider"></div>
+        <div class="nav-item" data-filter="done">
+          <span class="nav-icon">✅</span>
+          <span class="nav-label">Completed</span>
+          <span class="nav-count" id="count-done">0</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn-logout" id="btn-logout">
+          <span>🚪</span> Log out
+        </button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="main-header">
+        <button class="menu-toggle" id="menu-toggle">☰</button>
+        <div class="header-icon">📋</div>
+        <span class="header-title" id="header-title">All tasks</span>
+        <div class="header-actions">
+          <button class="hbtn" id="btn-sort-date" title="Sort by date">
+            📅
+          </button>
+          <button class="hbtn" id="btn-sort-name" title="Sort A–Z">🔤</button>
+        </div>
+      </div>
+
+      <div class="tasks-area" id="tasks-list"></div>
+
+      <div class="add-bar">
+        <input
+          type="text"
+          id="new-task-input"
+          placeholder="Add a new task… (press Enter)"
+        />
+        <button class="add-plus" id="btn-add" title="Add task">+</button>
+      </div>
     </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal">
+        <h2>Edit task</h2>
+        <input type="hidden" id="edit-id" />
+        <div class="modal-field">
+          <label>Title</label>
+          <input type="text" id="edit-title" placeholder="Task title" />
+        </div>
+        <div class="modal-field">
+          <label>Due date</label>
+          <input type="date" id="edit-due" />
+        </div>
+        <div class="modal-field">
+          <label>Notes</label>
+          <textarea id="edit-desc" placeholder="Optional notes…"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancel" id="btn-cancel">Cancel</button>
+          <button class="btn-save" id="btn-save">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../js/main.js"></script>
   </body>
 </html>
